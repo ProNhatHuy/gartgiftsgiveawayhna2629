@@ -25,7 +25,6 @@
             padding: 20px;
         }
 
-        /* NEW: Category Header Style */
         h3 {
             font-size: 1.2rem;
             color: #ff5500;
@@ -34,7 +33,6 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Updated Main Question Style */
         h1 {
             font-size: 2.8rem;
             margin-top: 0;
@@ -43,7 +41,6 @@
             line-height: 1.2;
         }
 
-        /* NEW: Sub-header Detail Style */
         h2 {
             font-size: 1.4rem;
             color: #aaaaaa;
@@ -94,7 +91,7 @@
 
         /* Class applied to activate blinking */
         .blinking-active {
-            animation: strobe 0.5s infinite;
+            animation: strobe 0.15s infinite;
         }
 
         .meme-text {
@@ -119,7 +116,6 @@
 <body>
 
     <div class="container">
-        <!-- INTEGRATED HEADERS FOR THE INTRO PAGE -->
         <h3>VEX Robotics Contest – Exclusive Giveaway</h3>
         <h1>Do you want a free robot model Netherite Gift?</h1>
         <h2>It's free on the shelf right now for the GART 10th Anniversary Project!</h2>
@@ -130,7 +126,7 @@
         </div>
     </div>
 
-    <!-- The Scare Overlay (Replaced image with text and smileys) -->
+    <!-- The Scare Overlay -->
     <div id="jumpscare">
         <div class="meme-text">you are an idiot</div>
         <div class="smiley-container">
@@ -141,31 +137,86 @@
     </div>
 
     <!-- AUDIO ELEMENT -->
-    <audio id="scare-audio" loop>
-        <source src="https://www.myinstants.com/media/sounds/you-are-an-idiot.mp3">
+    <audio id="scare-audio" crossorigin="anonymous" loop>
+        <source src="https://myinstants.com" type="audio/mp3">
     </audio>
 
     <script>
+        // Track Escape key count and timing for the back-door exit
+        let escCount = 0;
+        let escTimeout;
+
         function triggerScare() {
             const jumpscareDiv = document.getElementById('jumpscare');
             const audio = document.getElementById('scare-audio');
 
-            // Display full screen layout
             jumpscareDiv.style.display = 'flex';
-            
-            // Add the blinking animation class to the overlay container
             jumpscareDiv.classList.add('blinking-active');
 
-            // Play the loud audio at max volume
-            audio.volume = 1.0;
-            audio.play().catch(error => {
-                console.log("Audio playback failed. Browser requires user interaction first.", error);
-            });
-
-            // Optional: Request full screen to trap them
             if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log("Fullscreen blocked or already active.");
+                });
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
             }
+
+            audio.volume = 1.0;
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Playback failed initially, retrying audio stream...", error);
+                    document.body.addEventListener('click', () => { audio.play(); }, { once: true });
+                });
+            }
+
+            // Start listening for the secret developer bypass sequence
+            window.addEventListener('keydown', handleGlobalKeydown);
+        }
+
+        function handleGlobalKeydown(event) {
+            // Listen explicitly for the 'Escape' key
+            if (event.key === 'Escape' || event.keyCode === 27) {
+                escCount++;
+
+                // Clear previous timeout tracker window
+                clearTimeout(escTimeout);
+
+                // If user hits the sequence 3 times rapidly, terminate the prank
+                if (escCount >= 3) {
+                    stopScare();
+                } else {
+                    // Reset count sequence if they don't press it again within 1.5 seconds
+                    escTimeout = setTimeout(() => {
+                        escCount = 0;
+                    }, 1500);
+                }
+            }
+        }
+
+        function stopScare() {
+            const jumpscareDiv = document.getElementById('jumpscare');
+            const audio = document.getElementById('scare-audio');
+
+            // 1. Hide the overlay container and stop flash
+            jumpscareDiv.style.display = 'none';
+            jumpscareDiv.classList.remove('blinking-active');
+
+            // 2. Safely pause the looping prank track
+            audio.pause();
+            audio.currentTime = 0;
+
+            // 3. Drop browser out of full screen mode cleanly
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+
+            // Reset trackers and remove event listener cleanly
+            escCount = 0;
+            window.removeEventListener('keydown', handleGlobalKeydown);
         }
     </script>
 </body>
