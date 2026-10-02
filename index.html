@@ -1,1 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GART 10th Year Anniversary Project 2026</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d0d0d;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            z-index: 2;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        /* NEW: Category Header Style */
+        h3 {
+            font-size: 1.2rem;
+            color: #ff5500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Updated Main Question Style */
+        h1 {
+            font-size: 2.8rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px #ff5500;
+            line-height: 1.2;
+        }
+
+        /* NEW: Sub-header Detail Style */
+        h2 {
+            font-size: 1.4rem;
+            color: #aaaaaa;
+            font-weight: normal;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: 2px solid #ff5500;
+            background-color: #1a1a1a;
+            color: white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #ff5500;
+            box-shadow: 0 0 15px #ff5500;
+        }
+
+        /* Jumpscare overlay hidden by default */
+        #jumpscare {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Rapid blinking animation */
+        @keyframes strobe {
+            0% { background-color: #ffffff; color: #000000; }
+            50% { background-color: #000000; color: #ffffff; }
+            100% { background-color: #ffffff; color: #000000; }
+        }
+
+        /* Class applied to activate blinking */
+        .blinking-active {
+            animation: strobe 0.5s infinite;
+        }
+
+        .meme-text {
+            font-size: 4.5rem;
+            font-weight: bold;
+            font-family: "Times New Roman", Times, serif;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .smiley-container {
+            display: flex;
+            gap: 40px;
+        }
+
+        .smiley {
+            font-size: 5rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- INTEGRATED HEADERS FOR THE INTRO PAGE -->
+        <h3>VEX Robotics Contest – Exclusive Giveaway</h3>
+        <h1>Do you want a free robot model Netherite Gift?</h1>
+        <h2>It's free on the shelf right now for the GART 10th Anniversary Project!</h2>
+        
+        <div class="btn-container">
+            <button onclick="triggerScare()">Yes, I want to</button>
+            <button onclick="triggerScare()">Maybe you aren't a fan of technological stuffs</button>
+        </div>
+    </div>
+
+    <!-- The Scare Overlay (Replaced image with text and smileys) -->
+    <div id="jumpscare">
+        <div class="meme-text">you are an idiot</div>
+        <div class="smiley-container">
+            <div class="smiley">☺</div>
+            <div class="smiley">☺</div>
+            <div class="smiley">☺</div>
+        </div>
+    </div>
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="scare-audio" loop>
+        <source src="https://www.myinstants.com/media/sounds/you-are-an-idiot.mp3">
+    </audio>
+
+    <script>
+        function triggerScare() {
+            const jumpscareDiv = document.getElementById('jumpscare');
+            const audio = document.getElementById('scare-audio');
+
+            // Display full screen layout
+            jumpscareDiv.style.display = 'flex';
+            
+            // Add the blinking animation class to the overlay container
+            jumpscareDiv.classList.add('blinking-active');
+
+            // Play the loud audio at max volume
+            audio.volume = 1.0;
+            audio.play().catch(error => {
+                console.log("Audio playback failed. Browser requires user interaction first.", error);
+            });
+
+            // Optional: Request full screen to trap them
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
 
