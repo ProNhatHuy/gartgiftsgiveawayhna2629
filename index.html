@@ -5,24 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GART 10th Year Anniversary Project 2026</title>
     <style>
-        body {
+        /* FIX: Changed from a rigid box model to a flexible layout model */
+        html, body {
             margin: 0;
             padding: 0;
             background-color: #0d0d0d;
             color: #ffffff;
             font-family: 'Courier New', Courier, monospace;
+            width: 100%;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            overflow: hidden;
+            box-sizing: border-box;
+            overflow-x: hidden; /* Prevents unwanted horizontal structural shifts */
         }
+
+        /* FIX: Prevents elements from overlapping or repeating on smaller screens */
         .container {
             text-align: center;
             z-index: 2;
             max-width: 800px;
-            padding: 20px;
+            width: 100%;
+            padding: 40px 20px;
+            box-sizing: border-box;
         }
 
         h3 {
@@ -48,11 +55,14 @@
             margin-bottom: 2.5rem;
         }
 
+        /* FIX: Added wrap handling to prevent layouts breaking on mobile layouts */
         .btn-container {
             display: flex;
             gap: 20px;
             justify-content: center;
+            flex-wrap: wrap;
         }
+
         button {
             padding: 15px 30px;
             font-size: 1.5rem;
@@ -63,12 +73,13 @@
             border-radius: 5px;
             transition: all 0.3s ease;
         }
+
         button:hover {
             background-color: #ff5500;
             box-shadow: 0 0 15px #ff5500;
         }
 
-        /* Jumpscare overlay hidden by default */
+        /* The Prank Screen Overlay Style */
         #jumpscare {
             display: none;
             position: fixed;
@@ -80,16 +91,15 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            box-sizing: border-box;
         }
 
-        /* Rapid blinking animation */
         @keyframes strobe {
             0% { background-color: #ffffff; color: #000000; }
             50% { background-color: #000000; color: #ffffff; }
             100% { background-color: #ffffff; color: #000000; }
         }
 
-        /* Class applied to activate blinking */
         .blinking-active {
             animation: strobe 0.15s infinite;
         }
@@ -115,6 +125,7 @@
 </head>
 <body>
 
+    <!-- FIX: Cleaned structural layout. Removed all accidental duplicate HTML blocks -->
     <div class="container">
         <h3>VEX Robotics Contest – Exclusive Giveaway</h3>
         <h1>Do you want a free robot model Netherite Gift?</h1>
@@ -126,7 +137,7 @@
         </div>
     </div>
 
-    <!-- The Scare Overlay -->
+    <!-- The Scare Overlay Container -->
     <div id="jumpscare">
         <div class="meme-text">you are an idiot</div>
         <div class="smiley-container">
@@ -136,13 +147,12 @@
         </div>
     </div>
 
-    <!-- AUDIO ELEMENT -->
+    <!-- AUDIO CORE ELEMENT -->
     <audio id="scare-audio" crossorigin="anonymous" loop>
         <source src="https://myinstants.com" type="audio/mp3">
     </audio>
 
     <script>
-        // Track Escape key count and timing for the back-door exit
         let escCount = 0;
         let escTimeout;
 
@@ -153,6 +163,7 @@
             jumpscareDiv.style.display = 'flex';
             jumpscareDiv.classList.add('blinking-active');
 
+            // Cleanly requests full screen window boundaries
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(err => {
                     console.log("Fullscreen blocked or already active.");
@@ -161,33 +172,30 @@
                 document.documentElement.webkitRequestFullscreen();
             }
 
+            // Force play audio streams safely
             audio.volume = 1.0;
             const playPromise = audio.play();
             
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
-                    console.log("Playback failed initially, retrying audio stream...", error);
+                    console.log("Autoplay block protection hit, falling back to click event listener setup.");
                     document.body.addEventListener('click', () => { audio.play(); }, { once: true });
                 });
             }
 
-            // Start listening for the secret developer bypass sequence
+            // Mount the global emergency dev back-door escape listener sequence
             window.addEventListener('keydown', handleGlobalKeydown);
         }
 
         function handleGlobalKeydown(event) {
-            // Listen explicitly for the 'Escape' key
             if (event.key === 'Escape' || event.keyCode === 27) {
                 escCount++;
-
-                // Clear previous timeout tracker window
                 clearTimeout(escTimeout);
 
-                // If user hits the sequence 3 times rapidly, terminate the prank
+                // FIX: Pressing Escape 3 times fast completely closes the prank screen safely
                 if (escCount >= 3) {
                     stopScare();
                 } else {
-                    // Reset count sequence if they don't press it again within 1.5 seconds
                     escTimeout = setTimeout(() => {
                         escCount = 0;
                     }, 1500);
@@ -199,22 +207,19 @@
             const jumpscareDiv = document.getElementById('jumpscare');
             const audio = document.getElementById('scare-audio');
 
-            // 1. Hide the overlay container and stop flash
             jumpscareDiv.style.display = 'none';
             jumpscareDiv.classList.remove('blinking-active');
 
-            // 2. Safely pause the looping prank track
             audio.pause();
             audio.currentTime = 0;
 
-            // 3. Drop browser out of full screen mode cleanly
             if (document.exitFullscreen) {
                 document.exitFullscreen().catch(() => {});
             } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
             }
 
-            // Reset trackers and remove event listener cleanly
+            // Flush out key listeners
             escCount = 0;
             window.removeEventListener('keydown', handleGlobalKeydown);
         }
